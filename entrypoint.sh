@@ -44,7 +44,7 @@ fi
 
 cd "${GITHUB_WORKSPACE}" || exit
 
-# Apply hotfix for 'fatal: unsafe repository' error (see #10).
+# Apply hotfix for 'fatal: unsafe repository' error.
 git config --global --add safe.directory "${GITHUB_WORKSPACE}"
 
 if [ -z "${INPUT_TAG}" ]; then
@@ -55,6 +55,9 @@ fi
 # Set up variables.
 FLAGS=""
 TAG=$(echo "${INPUT_TAG}" | sed 's/ /_/g')
+case "$TAG" in
+  -*) echo "[action-create-tag] Invalid tag name: must not start with '-'."; exit 1 ;;
+esac
 ACTION_OUTPUT_MESSAGE="[action-create-tag] Push tag '${TAG}'"
 MESSAGE="${INPUT_MESSAGE:-Release ${TAG}}"
 FORCE_TAG="${INPUT_FORCE_PUSH_TAG:-false}"
@@ -96,7 +99,7 @@ else
 fi
 
 # Check if tag already exists.
-if [ "$(git tag -l "${TAG}")"  ]; then tag_exists=true; else tag_exists=false; fi
+if [ "$(git tag -l -- "${TAG}")"  ]; then tag_exists=true; else tag_exists=false; fi
 echo "tag_exists=${tag_exists}" >> "${GITHUB_OUTPUT}"
 echo "TAG_EXISTS=${tag_exists}" >> "${GITHUB_ENV}"
 
@@ -105,7 +108,7 @@ echo "[action-create-tag] Create tag '${TAG}'."
 [ "${tag_exists}" = 'true' ] && echo "[action-create-tag] Tag '${TAG}' already exists."
 if [ "${FORCE_TAG}" = 'true' ]; then
   [ "${tag_exists}" = 'true' ] && echo "[action-create-tag] Overwriting tag '${TAG}' since 'force_push_tag' is set to 'true'."
-  git tag -fa "${TAG}" "${SHA}" -m "${MESSAGE}"
+  git tag -fa -- "${TAG}" "${SHA}" -m "${MESSAGE}"
   FLAGS="${FLAGS} --force"
   ACTION_OUTPUT_MESSAGE="${ACTION_OUTPUT_MESSAGE}, with --force"
 else
@@ -117,13 +120,15 @@ else
     fi
     echo "[action-create-tag] Ignoring error since 'tag_exists_error' is set to 'false'."
   else
-    git tag -a "${TAG}" "${SHA}" -m "${MESSAGE}"
+    git tag -a -- "${TAG}" "${SHA}" -m "${MESSAGE}"
   fi
 fi
 
-# Set up remote URL for checkout@v1 action.
+# Set up authentication without embedding the token in the remote URL.
 if [ -n "${INPUT_GITHUB_TOKEN}" ]; then
-  git remote set-url origin "https://${GITHUB_ACTOR}:${INPUT_GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+  export GIT_TOKEN_ENV="${INPUT_GITHUB_TOKEN}"
+  git config --global credential.https://github.com.helper \
+    '!f() { printf "username=x-access-token\npassword=%s\n" "$GIT_TOKEN_ENV"; }; f'
 fi
 
 # Handle no-verify action input.
@@ -136,4 +141,4 @@ fi
 [ "${tag_exists}" = 'true' ] && [ "${FORCE_TAG}" = 'false' ] && exit 0
 echo "${ACTION_OUTPUT_MESSAGE}"
 # shellcheck disable=SC2086
-git push $FLAGS origin "$TAG"
+git push $FLAGS origin -- "$TAG"
