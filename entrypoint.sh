@@ -141,4 +141,4 @@ fi
 [ "${tag_exists}" = 'true' ] && [ "${FORCE_TAG}" = 'false' ] && exit 0
 echo "${ACTION_OUTPUT_MESSAGE}"
 # shellcheck disable=SC2086
-git push $FLAGS origin -- "$TAG"
+git push $FLAGS origin "$TAG"
