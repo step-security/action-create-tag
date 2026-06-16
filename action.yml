@@ -37,7 +37,7 @@ outputs:
     description: "Whether the tag already existed."
 runs:
   using: "docker"
-  image: "Dockerfile"
+  image: "docker://ghcr.io/step-security/action-create-tag:v1.7.2@sha256:5ec53d87778b77c0714f124b854549432f48cf0400ddbbf8bfb5d1be80cda301" # v1.7.2
 branding:
   icon: "tag"
   color: "blue"
