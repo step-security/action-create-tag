@@ -108,7 +108,7 @@ echo "[action-create-tag] Create tag '${TAG}'."
 [ "${tag_exists}" = 'true' ] && echo "[action-create-tag] Tag '${TAG}' already exists."
 if [ "${FORCE_TAG}" = 'true' ]; then
   [ "${tag_exists}" = 'true' ] && echo "[action-create-tag] Overwriting tag '${TAG}' since 'force_push_tag' is set to 'true'."
-  git tag -fa -- "${TAG}" "${SHA}" -m "${MESSAGE}"
+  git tag -fa -m "${MESSAGE}" -- "${TAG}" "${SHA}"
   FLAGS="${FLAGS} --force"
   ACTION_OUTPUT_MESSAGE="${ACTION_OUTPUT_MESSAGE}, with --force"
 else
@@ -120,7 +120,7 @@ else
     fi
     echo "[action-create-tag] Ignoring error since 'tag_exists_error' is set to 'false'."
   else
-    git tag -a -- "${TAG}" "${SHA}" -m "${MESSAGE}"
+    git tag -a -m "${MESSAGE}" -- "${TAG}" "${SHA}"
   fi
 fi
 
