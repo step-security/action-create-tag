@@ -18,12 +18,12 @@ jobs:
         if: startsWith(github.event.inputs.release_tag, 'v')
         steps:
         - name: Harden the runner (Audit all outbound calls)
-          uses: step-security/harden-runner@v2
+          uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
           with:
             egress-policy: audit
 
         - name: Checkout
-          uses: actions/checkout@v6
+          uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         - name: Validate tag format
           run: |
             TAG=${{ github.event.inputs.release_tag }}
@@ -33,20 +33,20 @@ jobs:
             fi
             echo "✅ Valid semver tag: $TAG"
         - name: Log in to GitHub Container Registry
-          uses: step-security/docker-login-action@v4
+          uses: step-security/docker-login-action@164e21d7e52229904128e2f946001cb88278c33d # v4.2.0
           with:
             registry: ghcr.io
             username: ${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Set up QEMU for ARM builds
-          uses: step-security/setup-qemu-action@v4
+          uses: step-security/setup-qemu-action@109c6ed9f089be1a250c75fd6a534e30df44e030 # v4.0.0
 
         - name: Set up Docker Buildx
-          uses: step-security/setup-buildx-action@v4
+          uses: step-security/setup-buildx-action@6997872a55d77391e51b87609556578131f44402 # v4.1.0
 
         - name: Build and push Docker image
-          uses: step-security/docker-build-push-action@v7
+          uses: step-security/docker-build-push-action@9af9b5acc1751dcec2aa5375a068979fa526bc9a # v7.2.0
           with:
             context: .
             push: true
