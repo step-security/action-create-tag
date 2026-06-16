@@ -8,12 +8,12 @@ ACTION_REPO="${GITHUB_ACTION_REPOSITORY:-}"
 DOCS_URL="https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions"
 
 echo ""
-echo -e "\033[1;36mStepSecurity Maintained Action\033[0m"
+printf '\033[1;36mStepSecurity Maintained Action\033[0m\n'
 echo "Secure drop-in replacement for $UPSTREAM"
 if [ "$REPO_PRIVATE" = "false" ]; then
-  echo -e "\033[32m✓ Free for public repositories\033[0m"
+  printf '\033[32m✓ Free for public repositories\033[0m\n'
 fi
-echo -e "\033[36mLearn more:\033[0m $DOCS_URL"
+printf '\033[36mLearn more:\033[0m %s\n' "$DOCS_URL"
 echo ""
 
 if [ "$REPO_PRIVATE" != "false" ]; then
@@ -33,11 +33,11 @@ if [ "$REPO_PRIVATE" != "false" ]; then
     -d "$BODY" \
     "$API_URL" -o /dev/null) && CURL_EXIT_CODE=0 || CURL_EXIT_CODE=$?
 
-  if [ $CURL_EXIT_CODE -ne 0 ]; then
+  if [ "$CURL_EXIT_CODE" -ne 0 ]; then
     echo "Timeout or API not reachable. Continuing to next step."
   elif [ "$RESPONSE" = "403" ]; then
-    echo -e "::error::\033[1;31mThis action requires a StepSecurity subscription for private repositories.\033[0m"
-    echo -e "::error::\033[31mLearn how to enable a subscription: $DOCS_URL\033[0m"
+    printf '::error::\033[1;31mThis action requires a StepSecurity subscription for private repositories.\033[0m\n'
+    printf '::error::\033[31mLearn how to enable a subscription: %s\033[0m\n' "$DOCS_URL"
     exit 1
   fi
 fi
