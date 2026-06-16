@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: step-security/action-condd@v1
+      - uses: step-security/action-cond@v1
         id: reporter
         with:
           cond: ${{ github.event_name == 'pull_request' }}
